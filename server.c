@@ -79,7 +79,7 @@ int accept_data(int socket_type, int* sockfd,struct sockaddr_in* server, struct 
 {
     
     int data_packet;
-    int len;
+    unsigned int len;
     //Socket create and verification 
     *sockfd = socket(AF_INET, socket_type, 0); 
     if (*sockfd == -1)
@@ -93,7 +93,7 @@ int accept_data(int socket_type, int* sockfd,struct sockaddr_in* server, struct 
     }
 
     //Zero out the server address
-    bzero(server, sizeof(server));
+    bzero(server, sizeof(&server));
 
     // assign IP, PORT 
     server->sin_family = AF_INET; 
@@ -190,17 +190,16 @@ int main()
     struct sockaddr_in client;
     struct config_file_data* config_data; 
     char buff[1024];
-    printf("I GOT HERE \n");
+    printf("I GOT HERE 1 \n");
     //Pre-probing phase
     connfd = accept_data(SOCK_STREAM, &sockfd, &server, &cli);
-    storage_success(connfd, buffer2, 1000, &config_data);
+    storage_success(connfd, buffer, 1000, config_data);
     printf("Ending connection\n");
     close(sockfd);
 
     sleep(20); 
 
-    buffer =  calloc(config_data.payload_size, sizeof(char));  
-    struct sockaddr_in  client;
+    buffer =  calloc(config_data->payload_size, sizeof(char));  
     int fd;
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     // Creating socket file descriptor 
@@ -216,7 +215,7 @@ int main()
     // Filling server information 
     server.sin_family = AF_INET; // IPv4 
     server.sin_addr.s_addr = htonl(INADDR_ANY); 
-    server.sin_port = htons(atoi(config_data.dest_prt_udp)); 
+    server.sin_port = htons(atoi(config_data->dest_prt_udp)); 
       
     // Bind the socket with the server address 
     if (bind(fd, (const struct sockaddr *)&server, sizeof(server)) < 0 ) 
@@ -231,16 +230,17 @@ int main()
     
 
     //Probing Phase
-    int n; 
     clock_t start_t, end_t;
     double total_t, low_entropy, high_entropy;
   
     len = sizeof(client);  //len is value/resuslt 
 
+    printf("I GOT HERE 2 \n");
+
     start_t = clock();
-    for (int i=0;i<config_data.num_of_packets;i++){ 
+    for (int i=0;i<config_data->num_of_packets;i++){ 
       
-        n = recvfrom(fd, (char *)buffer, config_data.payload_sz,  
+        n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
                MSG_WAITALL, ( struct sockaddr *) &client, 
                &len); 
 
@@ -250,11 +250,11 @@ int main()
     low_entropy = total_t * 1000;
     printf("time : %f\n", low_entropy);
 
-    sleep(tcp_info.in_time);
+    sleep(config_data->inter_time);
 
     start_t = clock();
     for (int i=0;i<config_data.num_of_packets;i++){        
-        n = recvfrom(fd, (char *)buffer, config_data.payload_sz,  
+        n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
                 MSG_WAITALL, ( struct sockaddr *) &client, 
                 &len);
     }
