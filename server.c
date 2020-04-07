@@ -184,12 +184,12 @@ int main()
     int sockfd;
     int connfd;
     int len;
-    char* buffer1;
+    char* buffer;
     struct sockaddr_in server;
     struct sockaddr_in cli; 
     struct sockaddr_in client;
     struct config_file_data* config_data; 
-    char buffer2[1024];
+    char buff[1024];
     printf("I GOT HERE \n");
     //Pre-probing phase
     connfd = accept_data(SOCK_STREAM, &sockfd, &server, &cli);
@@ -199,7 +199,7 @@ int main()
 
     sleep(20); 
 
-    buffer1 =  calloc(config_data.payload_size, sizeof(char));  
+    buffer =  calloc(config_data.payload_size, sizeof(char));  
     struct sockaddr_in  client;
     int fd;
     fd = socket(AF_INET, SOCK_DGRAM, 0);
