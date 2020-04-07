@@ -196,7 +196,7 @@ int main()
     storage_success(connfd, buffer, 1000, config_data);
     printf("Ending connection\n");
     close(sockfd);
-
+    printf("What happened.");
     sleep(20); 
 
     buffer =  calloc(config_data->payload_size, sizeof(char));  
