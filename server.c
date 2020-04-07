@@ -183,7 +183,7 @@ int main()
 { 
     int sockfd;
     int connfd;
-    int len;
+    unsigned int len;
     char* buffer;
     struct sockaddr_in server;
     struct sockaddr_in cli; 
