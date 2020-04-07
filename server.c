@@ -141,7 +141,7 @@ int accept_data(int socket_type, int* sockfd,struct sockaddr_in* server, struct 
 void recieve_train(struct config_file_data* config_data)
 {
     int sockfd;
-    int len;
+    unsigned int len;
     int end_of_buffer; ; 
     char buffer[1024]; 
     char* hello = "Hello from server"; 
@@ -232,6 +232,7 @@ int main()
     //Probing Phase
     clock_t start_t, end_t;
     double total_t, low_entropy, high_entropy;
+    int n;
   
     len = sizeof(client);  //len is value/resuslt 
 
@@ -240,7 +241,7 @@ int main()
     start_t = clock();
     for (int i=0;i<config_data->num_of_packets;i++){ 
       
-        int n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
+        n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
                MSG_WAITALL, ( struct sockaddr *) &client, 
                &len); 
 
