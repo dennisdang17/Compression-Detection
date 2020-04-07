@@ -240,7 +240,7 @@ int main()
     start_t = clock();
     for (int i=0;i<config_data->num_of_packets;i++){ 
       
-        n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
+        int n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
                MSG_WAITALL, ( struct sockaddr *) &client, 
                &len); 
 
@@ -253,7 +253,8 @@ int main()
     sleep(config_data->inter_time);
 
     start_t = clock();
-    for (int i=0;i<config_data.num_of_packets;i++){        
+    for (int i=0;i<config_data->num_of_packets;i++)
+    {        
         n = recvfrom(fd, (char *)buffer, config_data->payload_size,  
                 MSG_WAITALL, ( struct sockaddr *) &client, 
                 &len);
