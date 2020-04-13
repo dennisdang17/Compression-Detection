@@ -41,7 +41,7 @@ int main()
     server_address.sin_port = htons(8765); //port numbers
 
     client_address.sin_family = AF_INET; //IPV4
-    client_address.sin_addr.s_addr = inet_addr("192.168.1.26"); //hard coded ip
+    client_address.sin_addr.s_addr = inet_addr("192.168.1.32"); //hard coded ip
     client_address.sin_port = htons(8765); //port numbers
 
     
