@@ -1,0 +1,12 @@
+{
+	//the ones with values are the default ones in the project specifications
+	"Server_IP_Address": " ",
+	"Source_Port_Number_UDP": " ",
+	"Destination_Port_Number_TCP_Head": " ",
+	"Destination_Port_Number_TCP_Tail": " ",
+	"Port_Number_TCP": " ",
+	"Size_UDP_Payload": "1000",
+	"Inter_Measurement_Time": "15",
+	"Number_UDP_Packets": "6000",
+	"TTL_UDP_Packets": "255",
+}
