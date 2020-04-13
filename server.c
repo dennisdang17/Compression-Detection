@@ -10,13 +10,14 @@
 #include <errno.h>
 #include <time.h>
 #define BUF_SIZE 1024
+#define THRESHOLD 100
 
 
 int main()
 {
     int sockfd;
     char buffer[BUF_SIZE];
-    char * message = "Package received! Thank you!";
+    char message[25];
     struct sockaddr_in server_address, client_address;
 
     //Creation of socket
@@ -58,20 +59,48 @@ int main()
 
     //Start of probing phase
     socklen_t len = sizeof(struct sockaddr_storage);
-    //clock_t start_time, end_time;
+    clock_t start_time, end_time;
+    double total_time, low_entropy_time, high_entropy_time;
     
     printf("Listening ...\n");
-    //start_time = clock();
-    
-    //in a forloop
-    recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
 
-
-    printf("Client's Data is : ");
-    for(int i=0; i<BUF_SIZE; i++)
+    //low entropy
+    start_time = clock();
+    for(int i = 0; i < 1000; i++)//replace 10 with the number of packets
     {
-       printf("%d ", buffer[i]);
+        recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
     }
+    end_time = clock();
+    total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
+    low_entropy_time = total_time * 1000;
+    printf("Low Entropy Time: %f\n", low_entropy_time);
+
+    printf("Sleeping...\n");
+    sleep(15); //replace with inter time
+
+    //high entropy
+    memset(&buffer, 0, BUF_SIZE);
+    start_time = clock();
+    for(int i = 0; i < 1000; i++)//replace 10 with the number of packets
+    {
+        recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
+    }
+    end_time = clock();
+    total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
+    high_entropy_time = total_time * 1000;
+    printf("High Entropy Time: %f\n", high_entropy_time);
+
+
+    if((high_entropy_time - low_entropy_time) > THRESHOLD)
+    {
+        strcpy(message, "COMPRESSION DETECTED\n");
+    }
+    else
+    {
+        strcpy(message, "NO COMPRESSION DETECTED\n");
+    }
+    
+    //receive data. Calculate and then sned back findings :)
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
     printf("Message sent\n");
     return 0;
