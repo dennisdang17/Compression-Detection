@@ -10,7 +10,6 @@
 #include <errno.h>
 #include <time.h>      
 
-
 //Filling the payload with data
 
 /*void read_high_entropy_data(char * data, int len)
@@ -78,12 +77,27 @@ int main()
     //Probing phase. Sending packet of data
 
     //Making data packets
-    //read_high_entropy_data(datagram, length);
-    test_high_entropy_data(datagram, length);
-    //read_low_entropy_data(datagram, length);
 
+    //send low entropy now
+    read_low_entropy_data(datagram, length);
+    for(int i=0; i < 1000; i++)//change 10 iwth # of packets
+    {
+        sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+    }
+    printf("Low entropy sent!!\n");
+
+    printf("Sleeping...\n");
+    sleep(15);
+    
+    //send high entropy now
+    //read_high_entropy_data(datagram, length);
+    for(int i=0; i < 1000; i++)
+    {
+        test_high_entropy_data(datagram, length);
+        sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+    }
     sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
-    printf("Message sent!\n");
+    printf("High entropy sent!!\n");
 
     //receive response
     int end_of_buffer;
