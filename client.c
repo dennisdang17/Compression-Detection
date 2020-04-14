@@ -11,8 +11,7 @@
 #include <time.h>      
 
 //Filling the payload with data
-
-/*void read_high_entropy_data(char * data, int len)
+void read_high_entropy_data(char * data, int len)
 {
     FILE * f = fopen("/dev/random", "r");
     char temp;
@@ -27,34 +26,43 @@
         data[i] = temp;
     }
 
-}*/
+}
 
+//Test function just incase dev/random runs out of things to test
 void test_high_entropy_data(char* data, int len)
 {
     srand(time(NULL));
     for(int i=0; i<len; i++)
     {
-	data[i] = rand() %127;
+	    data[i] = rand() %127;
     }
 }
 
+//Filling payload with low entropy data
 void read_low_entropy_data(char * data, int len)
 {
-    for(int i=0; i<len; i++)
+    for(int i=0; i<len; i++) 
     {
         data[i] = 0;
     }
 }
 
+void set_packet_id(char * data, int index)
+{
+    data[0] = index;
+}
+
 int main()
 {
-    int sockfd;
-    int length;
+    int sockfd, length, DF;
     char datagram[1024];
-    char buffer[1024];
+    char buffer[25];
     struct sockaddr_in server_address;
     length = sizeof(datagram) / sizeof(char);
     
+    //preProbing.
+
+    //creating socket
     printf("Creating Socket...\n");
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 )
     { 
@@ -66,38 +74,55 @@ int main()
         printf("Socket created successfully!\n");
     }
 
-    
-    memset(&server_address, 0 , sizeof(server_address));
 
     //set server struct header
+    memset(&server_address, 0 , sizeof(server_address));
     server_address.sin_family = AF_INET;  //ipv4
     server_address.sin_port = htons(8765); //server port
-    server_address.sin_addr.s_addr = inet_addr("192.168.1.30"); 
+    server_address.sin_addr.s_addr = inet_addr("192.168.1.30"); //Change to configfile.serverIP
     
+    //Don't fragment bit
+    DF = IP_PMTUDISC_DO; //make val equal to dont fragment
+    printf("Setting DON'T FRAGMENT bit...\n");
+    if(setsockopt( sockfd, IPPROTO_IP, IP_MTU_DISCOVER, &DF, sizeof(DF)) < 0)
+    {
+        printf("Unable to set DON'T FRAGMENT bit\n");
+    }
+    else
+    {
+        printf("DON'T FRAGMENT bit set correctly!\n");
+    }
+    
+
+
     //Probing phase. Sending packet of data
 
-    //Making data packets
 
     //send low entropy now
     read_low_entropy_data(datagram, length);
-    for(int i=0; i < 1000; i++)//change 10 iwth # of packets
+    for(int i=1; i < 11; i++)//chagne to payload size
     {
+        set_packet_id(datagram, i);
         sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     printf("Low entropy sent!!\n");
 
     printf("Sleeping...\n");
-    sleep(15);
+    sleep(15); //replace with inter time
     
     //send high entropy now
-    //read_high_entropy_data(datagram, length);
-    for(int i=0; i < 1000; i++)
+    for(int i=1; i < 11; i++) //change to payload size
     {
         test_high_entropy_data(datagram, length);
+        set_packet_id(datagram, i);
+        //read_high_entropy_data(datagram, length);
         sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     printf("High entropy sent!!\n");
+
+
+    //Post Probing
 
     //receive response
     int end_of_buffer;
