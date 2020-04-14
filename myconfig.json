@@ -1,7 +1,7 @@
 {
 	"Server_IP_Address": "127.0.0.1",
 	"Source_Port_Number_UDP": "9876",
-	"Destination_Port_Number_UDP": "8765"
+	"Destination_Port_Number_UDP": "8765",
 	"Destination_Port_Number_TCP_Head": "x",
 	"Destination_Port_Number_TCP_Tail": "y",
 	"Port_Number_TCP": "22",
