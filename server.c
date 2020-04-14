@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <time.h>
-#define BUF_SIZE 1024
+#define BUF_SIZE 50
 #define THRESHOLD 100
 
 
@@ -97,11 +97,11 @@ int main()
     //Calculate the time and then send back the data
     if((high_entropy_time - low_entropy_time) > THRESHOLD)
     {
-        strcpy(message, "COMPRESSION DETECTED\n");
+        strcpy(message, "COMPRESSION DETECTED\0");
     }
     else
     {
-        strcpy(message, "NO COMPRESSION DETECTED\n");
+        strcpy(message, "NO COMPRESSION DETECTED\0");
     }
     
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
