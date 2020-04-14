@@ -69,7 +69,7 @@ int main()
     for(int i = 0; i < 10; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
-        printf("This is index: %d", buffer[0]);
+        printf("Packet ID: %d\n", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
@@ -86,7 +86,7 @@ int main()
     for(int i = 0; i < 10; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
-        printf("Packet ID: %d ", buffer[0]);
+        printf("Packet ID: %d\n", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
