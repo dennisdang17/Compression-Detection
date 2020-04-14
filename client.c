@@ -22,7 +22,6 @@ void read_high_entropy_data(char * data, int len)
     for(int i=0; i < len; i++)
     {
         temp = getc(f);
-        printf("This is dev random: %d\n", temp);
         data[i] = temp;
     }
 
@@ -55,7 +54,7 @@ void set_packet_id(char * data, int index)
 int main()
 {
     int sockfd, length, DF;
-    char datagram[1024];
+    char datagram[10];
     char buffer[25];
     struct sockaddr_in server_address;
     length = sizeof(datagram) / sizeof(char);
@@ -113,9 +112,10 @@ int main()
     //send high entropy now
     for(int i=1; i < 11; i++) //change to payload size
     {
-        test_high_entropy_data(datagram, length);
+        //test_high_entropy_data(datagram, length);
+        read_high_entropy_data(datagram, length);
         set_packet_id(datagram, i);
-        //read_high_entropy_data(datagram, length);
+        
         sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
@@ -125,12 +125,9 @@ int main()
     //Post Probing
 
     //receive response
-    int end_of_buffer;
     unsigned int len;
-    end_of_buffer = recvfrom(sockfd, (char *)buffer, 1024, MSG_WAITALL, (struct sockaddr *) &server_address, &len); 
-    buffer[end_of_buffer] = '\0'; 
+    recvfrom(sockfd, (char *)buffer, 1024, MSG_WAITALL, (struct sockaddr *) &server_address, &len);  
     printf("Server : %s\n", buffer); 
-  
     close(sockfd); 
     return 0;
 }
