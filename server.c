@@ -44,8 +44,7 @@ int main()
     client_address.sin_addr.s_addr = inet_addr("192.168.1.32"); //hard coded ip
     client_address.sin_port = htons(8765); //port numbers
 
-    
-    //bind ip to socket
+    //bind server ip to socket
     if (bind(sockfd, (const struct sockaddr *)&server_address, sizeof(server_address)) < 0 ) 
     { 
         perror("bind failed"); 
@@ -64,11 +63,13 @@ int main()
     
     printf("Listening ...\n");
 
-    //low entropy
+    //receive low entropy data
+    printf("Receiving low entropy..\n");
     start_time = clock();
-    for(int i = 0; i < 1000; i++)//replace 10 with the number of packets
+    for(int i = 0; i < 10; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
+        printf("This is index: %d", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
@@ -78,12 +79,14 @@ int main()
     printf("Sleeping...\n");
     sleep(15); //replace with inter time
 
-    //high entropy
+    //receive high entropy data
+    printf("Receiving high entropy..\n");
     memset(&buffer, 0, BUF_SIZE);
     start_time = clock();
-    for(int i = 0; i < 1000; i++)//replace 10 with the number of packets
+    for(int i = 0; i < 10; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
+        printf("Packet ID: %d ", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
@@ -91,6 +94,7 @@ int main()
     printf("High Entropy Time: %f\n", high_entropy_time);
 
 
+    //Calculate the time and then send back the data
     if((high_entropy_time - low_entropy_time) > THRESHOLD)
     {
         strcpy(message, "COMPRESSION DETECTED\n");
@@ -100,7 +104,6 @@ int main()
         strcpy(message, "NO COMPRESSION DETECTED\n");
     }
     
-    //receive data. Calculate and then sned back findings :)
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
     printf("Message sent\n");
     return 0;
