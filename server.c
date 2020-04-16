@@ -37,7 +37,7 @@ int main()
 
     // Filling server and client information.
     server_address.sin_family = AF_INET; // IPv4 
-    server_address.sin_addr.s_addr = inet_addr("192.168.1.30"); //hard coded ip
+    server_address.sin_addr.s_addr = inet_addr("192.168.1.28"); //hard coded ip
     server_address.sin_port = htons(8765); //port numbers
 
     //bind server ip to socket
@@ -101,8 +101,7 @@ int main()
     }
     
     
-
-    //Post probing TCP CONNECTION
+    
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
     printf("Message sent\n");
     return 0;
