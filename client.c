@@ -39,7 +39,14 @@ void read_low_entropy_data(char * data, int len)
 
 void set_packet_id(char * data, int index)
 {
-    data[0] = index;
+    int temp = index;
+    printf("Packet ID before: %d\n", temp);
+    unsigned char lsb = (unsigned)temp & 0xff;
+    unsigned char msb = (unsigned)temp >> 8;
+    data[0] = lsb;
+    data[1] = msb;
+    int packet_id = (int)(((unsigned)data[1] << 8) | data[0]);
+    printf("Packet ID after: %d\n", packet_id);
 }
 
 int main()
@@ -71,7 +78,7 @@ int main()
     memset(&server_address, 0 , sizeof(server_address));
     server_address.sin_family = AF_INET;  //ipv4
     server_address.sin_port = htons(8765); //server port
-    server_address.sin_addr.s_addr = inet_addr("192.168.1.30"); //Change to configfile.serverIP
+    server_address.sin_addr.s_addr = inet_addr("192.168.1.28"); //Change to configfile.serverIP
     
     
     //Don't fragment bit
@@ -94,7 +101,7 @@ int main()
     read_low_entropy_data(datagram, length);
     for(int i=0; i < 50; i++)//chagne to payload size
     {
-        //set_packet_id(datagram, i);
+        set_packet_id(datagram, i);
         sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     printf("Low entropy sent!!\n");
