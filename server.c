@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <time.h>
-#define BUF_SIZE 50
+#define BUF_SIZE 2000
 #define THRESHOLD 100
 
 
@@ -40,10 +40,6 @@ int main()
     server_address.sin_addr.s_addr = inet_addr("192.168.1.30"); //hard coded ip
     server_address.sin_port = htons(8765); //port numbers
 
-    client_address.sin_family = AF_INET; //IPV4
-    client_address.sin_addr.s_addr = inet_addr("192.168.1.32"); //hard coded ip
-    client_address.sin_port = htons(8765); //port numbers
-
     //bind server ip to socket
     if (bind(sockfd, (const struct sockaddr *)&server_address, sizeof(server_address)) < 0 ) 
     { 
@@ -66,27 +62,27 @@ int main()
     //receive low entropy data
     printf("Receiving low entropy..\n");
     start_time = clock();
-    for(int i = 0; i < 10; i++)//replace 10 with the number of packets
+    for(int i = 0; i < 50; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
-        printf("Packet ID: %d\n", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
     low_entropy_time = total_time * 1000;
     printf("Low Entropy Time: %f\n", low_entropy_time);
 
+
     printf("Sleeping...\n");
     sleep(15); //replace with inter time
+
 
     //receive high entropy data
     printf("Receiving high entropy..\n");
     memset(&buffer, 0, BUF_SIZE);
     start_time = clock();
-    for(int i = 0; i < 10; i++)//replace 10 with the number of packets
+    for(int i = 0; i < 50; i++)//replace 10 with the number of packets
     {
         recvfrom(sockfd, buffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len);
-        printf("Packet ID: %d\n", buffer[0]);
     }
     end_time = clock();
     total_time  = (((double)end_time) - ((double)start_time)) / ((double)CLOCKS_PER_SEC);
@@ -104,6 +100,9 @@ int main()
         strcpy(message, "NO COMPRESSION DETECTED\0");
     }
     
+    
+
+    //Post probing TCP CONNECTION
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
     printf("Message sent\n");
     return 0;
