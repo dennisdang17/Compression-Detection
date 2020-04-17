@@ -109,12 +109,12 @@ int main(int argc, char *argv[]) {
 
     //print function that tests wether or not the parsing is successful
     printf("Server_IP_Address: %s\n", json_object_get_string(Server_IP_Address));
-    printf("Source_Port_Number_UDP: %s\n", json_object_get_string(Source_Port_Number_UDP));
+    printf("Source_Port_Number_UDP: %d\n", json_object_get_int(Source_Port_Number_UDP));
     printf("Destination_Port_Number_TCP_Head: %s\n", json_object_get_string(Destination_Port_Number_TCP_Head));
     printf("Destination_Port_Number_TCP_Tail: %s\n", json_object_get_string(Destination_Port_Number_TCP_Tail));
-    printf("Port_Number_TCP: %s\n", json_object_get_string(Port_Number_TCP));
-    printf("Size_UDP_Payload: %s\n", json_object_get_string(Size_UDP_Payload));
-    printf("Inter_Measurement_Time: %s\n", json_object_get_string(Inter_Measurement_Time));
+    printf("Port_Number_TCP: %d\n", json_object_get_int(Port_Number_TCP));
+    printf("Size_UDP_Payload: %d\n", json_object_get_int(Size_UDP_Payload));
+    printf("Inter_Measurement_Time: %d\n", json_object_get_int(Inter_Measurement_Time));
     printf("Number_UDP_Packets: %d\n", json_object_get_int(Number_UDP_Packets));
     printf("TTL_UDP_Packets: %d\n", json_object_get_int(TTL_UDP_Packets));
 
