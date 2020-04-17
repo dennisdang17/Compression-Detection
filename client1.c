@@ -25,9 +25,12 @@ void send_file(int sockfd) {
 
 }
 
-//Function that parses the JSON file into JSON objects for use
-void parse(int sockfd) {
-    char buffer[1024];
+int main(int argc, char *argv[]) { 
+	int sockfd, connfd;
+	struct sockaddr_in serv_addr, cli; //create structure object of sockaddr_in for client and server
+
+	//Parsing of the JSON file begins so the client knows which IP Address and Port number to bind to.
+	char buffer[1024];
     struct json_object *parsed_json; //structure that holds parsed JSON
     //structs that store the rest of fields of the JSON file
     struct json_object *Server_IP_Address;
@@ -55,22 +58,17 @@ void parse(int sockfd) {
     json_object_object_get_ex(parsed_json, "Number_UDP_Packets", &Number_UDP_Packets);
     json_object_object_get_ex(parsed_json, "TTL_UDP_Packets", &TTL_UDP_Packets);
 
-    //print function that tests wether or not the parsing is successful
+    /*print function that tests wether or not the parsing is successful*/
     printf("Server_IP_Address: %s\n", json_object_get_string(Server_IP_Address));
-    printf("Source_Port_Number_UDP: %s\n", json_object_get_string(Source_Port_Number_UDP));
+    printf("Source_Port_Number_UDP: %d\n", json_object_get_int(Source_Port_Number_UDP));
     printf("Destination_Port_Number_TCP_Head: %s\n", json_object_get_string(Destination_Port_Number_TCP_Head));
     printf("Destination_Port_Number_TCP_Tail: %s\n", json_object_get_string(Destination_Port_Number_TCP_Tail));
-    printf("Port_Number_TCP: %s\n", json_object_get_string(Port_Number_TCP));
-    printf("Size_UDP_Payload: %s\n", json_object_get_string(Size_UDP_Payload));
-    printf("Inter_Measurement_Time: %s\n", json_object_get_string(Inter_Measurement_Time));
+    printf("Port_Number_TCP: %d\n", json_object_get_int(Port_Number_TCP));
+    printf("Size_UDP_Payload: %d\n", json_object_get_int(Size_UDP_Payload));
+    printf("Inter_Measurement_Time: %d\n", json_object_get_int(Inter_Measurement_Time));
     printf("Number_UDP_Packets: %d\n", json_object_get_int(Number_UDP_Packets));
     printf("TTL_UDP_Packets: %d\n", json_object_get_int(TTL_UDP_Packets));
-}
-
-int main(int argc, char *argv[]) { 
-	int sockfd, connfd; 
-	struct sockaddr_in serv_addr, cli; //create structure object of sockaddr_in for client and server
-
+    
 	// socket create and varification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); //creates a TCP socket
 	if (sockfd == -1) { 
@@ -81,10 +79,10 @@ int main(int argc, char *argv[]) {
         printf("Socket Successfully Created.\n"); 
 
 	bzero(&serv_addr, sizeof(serv_addr));//zeroes out the server address
-
+	
 	serv_addr.sin_family = AF_INET; // specifies address family with IPv4 Protocol 
-    serv_addr.sin_addr.s_addr = inet_addr("10.0.0.218"); //binds to IP Address
-    serv_addr.sin_port = htons(8765); //binds to PORT
+    serv_addr.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //binds to IP Address
+    serv_addr.sin_port = htons(json_object_get_int(Port_Number_TCP)); //binds to PORT
 
 	// This connects the client socket to server socket 
 	if (connect(sockfd, (SA*)&serv_addr, sizeof(serv_addr)) != 0) { 
@@ -94,12 +92,10 @@ int main(int argc, char *argv[]) {
 	else
 		printf("Successfully connected to the server.\n"); 
 	
-	FILE *fp = fopen(argv[1], "r"); //opens file called in terminal which is myconfig.json
+	fp = fopen(argv[1], "r"); //opens file called in terminal which is myconfig.json
 
 	//calling function to send file
 	send_file(sockfd); 
-	//calling function to parse JSON file
-    parse(sockfd);
     //closes the socket after transfer
     close(sockfd); 
 } 
