@@ -150,7 +150,7 @@ int main(int argc, char * argv[])
 
     //PROBING PHASE//
 
-    int datagram[json_object_get_int(Size_UDP_Payload)];
+    int datagram[json_object_get_int(Size_UDP_Payload)+2];
     
 
     memset(&client_address, 0, sizeof(client_address));
@@ -193,12 +193,12 @@ int main(int argc, char * argv[])
     sleep(5);
 
     //Low entropy
-    read_low_entropy_data(datagram, json_object_get_int(Size_UDP_Payload));
+    read_low_entropy_data(datagram, json_object_get_int(Size_UDP_Payload)+2);
     printf("Sending Low Entropy Data...\n");
     for(i = 1; i < json_object_get_int(Number_UDP_Packets)+1; i++)//chagne to payload size
     {
         set_packet_id(datagram, i);
-        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload)+2, MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     printf("Low Entropy Sent!\n");
 
@@ -208,12 +208,12 @@ int main(int argc, char * argv[])
     
 
     //High Entropy
-    read_high_entropy_data(datagram, json_object_get_int(Size_UDP_Payload));
+    read_high_entropy_data(datagram, json_object_get_int(Size_UDP_Payload)+2);
     printf("Sending High Entropy Data...\n");
     for(i = 1; i < json_object_get_int(Number_UDP_Packets)+1; i++) //change to payload size
     {
         set_packet_id(datagram, i);
-        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload)+2, MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
     printf("High entropy sent!\n");
 
