@@ -51,5 +51,5 @@ gcc client.c -ljson-c -Wall -o "name of executable"
 ## Project Status
 The server - client application is complete. Standalone is still a work in progress.
 ## Contributors
-Dennis Dang - github.com/dennisdang17 \
-Gerardo Aldana - github.com/GeoDude1
+Dennis Dang - [Github](github.com/dennisdang17) | [Linkedin](https://www.linkedin.com/in/dennisqdang) \
+Gerardo Aldana - [Github](github.com/GeoDude1)
