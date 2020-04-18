@@ -49,6 +49,7 @@ void set_packet_id(int * data, int index)
     data[1] = msb; //set the second index to upper bit
 }
 
+//Send the file via tcp
 void send_file(int sockfd)
 { 
 	char buffer[BUF_SIZE]; //stores message to send to server                         
@@ -202,10 +203,9 @@ int main(int argc, char * argv[])
     }
     printf("Low Entropy Sent!\n");
 
-
+    //Sleeping inter measurement time
     printf("Sleeping...\n");
-    sleep(json_object_get_int(Inter_Measurement_Time)); //replace with inter time
-    
+    sleep(json_object_get_int(Inter_Measurement_Time));
 
     //High Entropy
     read_high_entropy_data(datagram, json_object_get_int(Size_UDP_Payload)+2);
@@ -218,7 +218,7 @@ int main(int argc, char * argv[])
     printf("High entropy sent!\n");
 
 
-    //Post Probing
+    //Post Probing//
 
 
     //receive response
