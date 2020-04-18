@@ -13,16 +13,7 @@ git clone http://github.com/dennisdang17/Compression-Detection.git
 ```
 ## Usage
 **Client Server Application**
-1) Compile the source code with the commands below\
-```c
-//Compile on server machine
-gcc server.c -ljson-c -Wall -o "name of executable"
-
-//Compile on client machine
-gcc client.c -ljson-c -Wall -o "name of executable"
-```
-
-2) Change the JSON file to the correct parameters you wish to use.\
+1) Change the JSON file to the correct parameters you wish to use.\
 The Config file contains :
 ```
     1. The Server’s IP Address
@@ -35,6 +26,14 @@ The Config file contains :
     8. Inter-Measurement Time, γ (default value: 15 seconds)
     9. The Number of UDP Packets in the UDP Packet Train, n (default value: 6000 )
     10. TTL for the UDP Packets (default value: 255 )
+```
+2) Compile the source code with the commands below\
+```c
+//Compile on server machine
+gcc server.c -ljson-c -Wall -o "name of executable"
+
+//Compile on client machine
+gcc client.c -ljson-c -Wall -o "name of executable"
 ```
 3) Run the application \
 **MAKE SURE TO RUN APPLCIATION ON SERVER SIDE FIRST**
