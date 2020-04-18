@@ -1,10 +1,10 @@
 # Compression Detection
 
-A project where there are two network applications that work together to detect whether network compression is present.
-One application is a client/server application and the other application is a standalone application which works in an uncooperative environment. 
-That is, the application detects network compression without requiring a special software being installed on the other host. 
+A project where there are two network applications that work together to detect whether network compression is present.\
+One application is a client/server application and the other application is a standalone application which works in an uncooperative environment.\
+That is, the application detects network compression without requiring a special software being installed on the other host.\
 This is inspired by the work
-[End-to-End Detection of Compression of Traffic Flows by Intermediaries (https://lasr.cs.ucla.edu/vahab/resources/compression_detection.pdf)
+[End-to-End Detection of Compression of Traffic Flows by Intermediaries ](https://lasr.cs.ucla.edu/vahab/resources/compression_detection.pdf)
 
 
 ## Installation
