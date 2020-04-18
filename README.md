@@ -48,3 +48,8 @@ gcc client.c -ljson-c -Wall -o "name of executable"
 #On the client system
 ./"name of executable" myconfig.json
 ```
+## Project Status
+
+## Contributors
+Dennis Dang - github.com/dennisdang17 \
+Gerardo Aldana - github.com/GeoDude1
