@@ -1,3 +1,44 @@
-# CompressionNetwork
+# Compression Detection
 
-Two programs that are used to detect compression when sending a packet. Uses sockets and TCP UDP concepts
+A project where there are two network applications that work together to detect whether network compression is present. One application is a client/server application and the other application is a standalone application which works in an uncooperative environment. 
+That is, the application detects network compression without requiring a special software being installed on the other host. This is inspired
+by the work, End-to-End Detection of Compression of Traffic Flows by Intermediaries
+
+
+## Installation
+```bash
+git clone http://github.com/dennisdang17/Compression-Detection.git
+```
+## Usage
+**Client Server Application**
+1) Compile the source code with the commands below
+```c
+gcc server.c -ljson-c -Wall -o "name of executable"
+```
+To compile on server machine
+```c
+gcc client.c -ljson-c -Wall -o "name of executable"
+```
+To compile on client machine
+2) Change the JSON file to the correct parameters you wish to use.
+The Config file contains :
+```
+    1. The Server’s IP Address
+    2. Source Port Number for UDP
+    3. Destination Port Number for UDP
+    4. Destination Port Number for TCP Head SYN, x
+    5. Destination Port Number for TCP Tail SYN, y
+    6. Port Number for TCP (Pre-/Post- Probing Phases)
+    7. The Size of the UDP Payload in the UDP Packet Train, (default value: 1000B)
+    8. Inter-Measurement Time, γ (default value: 15 seconds)
+    9. The Number of UDP Packets in the UDP Packet Train, n (default value: 6000 )
+    10. TTL for the UDP Packets (default value: 255 )
+```
+3) Run the application 
+**MAKE SURE TO RUN APPLCIATION ON SERVER SIDE FIRST**
+```
+#On the server system
+./server server myconfig.json
+#On the client system
+./client client myconfig.json
+```
