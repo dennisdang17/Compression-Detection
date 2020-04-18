@@ -8,7 +8,7 @@ This is inspired by the work:\
 
 
 ## Installation
-**This program also requires you to download JSON. To do that on a linux computer input the following command into your terminal.**
+**This program also requires you to download JSON. To install both JSON and the appllication on your linux computer/machine input the following commands into your terminal.**
 ```bash
 sudo apt install libjson-c-dev
 #Now to install the repository
