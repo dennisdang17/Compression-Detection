@@ -138,8 +138,8 @@ int main(int argc, char * argv[])
     //Set up the server address for the udp header
     int UDPbuffer[json_object_get_int(Size_UDP_Payload)+2];
     memset(&UDPbuffer, 0 , json_object_get_int(Size_UDP_Payload)+2);
-    server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //hard coded ip
-    server_address.sin_port = htons(json_object_get_int(Destination_Port_Number_UDP)); //port number
+    server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address));
+    server_address.sin_port = htons(json_object_get_int(Destination_Port_Number_UDP));
 
     //Creation of UDP socket
     printf("Creating Socket...\n");
@@ -210,10 +210,57 @@ int main(int argc, char * argv[])
     
 
     //Post-Probing-TCP//
+    printf("Creating Socket...\n");
+    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        perror("TCP Socket Creation Failed\n");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        printf("TCP Socket Creation Successful\n");
+    }
 
+    //Fill in IP header
+    memset(&server_address, 0 , sizeof(server_address));
+    memset(&client_address, 0, sizeof(client_address));
+    server_address.sin_family = AF_INET; // IPv4
+    server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address));
+    server_address.sin_port = htons(json_object_get_int(Port_Number_TCP));
 
-    sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
-    printf("Message sent\n");
+    //Bind TCP socket to port
+    printf("Binding...\n");
+    if ((bind(sockfd, (struct sockaddr *) &server_address, sizeof(server_address))) != 0)
+    { 
+        printf("TCP Socket Bind Failed\n"); 
+        exit(EXIT_FAILURE); 
+    } 
+    else
+    {
+        printf("TCP Socket Bind Successful\n"); 
+    }
+
+    //Listen to receive connections at port
+    printf("Listening...\n");
+    if ((listen(sockfd, 5)) != 0)
+    { 
+        printf("Listening Failed\n"); 
+        exit(EXIT_FAILURE); 
+    } 
+    
+    //Accept the connection
+    len = sizeof(client_address);
+    if ((connfd = accept(sockfd, (struct sockaddr *) &client_address, &len)) < 0)
+    { 
+        printf("TCP Connection Failed\n"); 
+        exit(0); 
+    } 
+    else
+    {
+        printf("TCP Connection Established\n"); 
+    }
+
+    send(connfd, message, strlen(message), 0);
     
     close(sockfd);
     return 0;
