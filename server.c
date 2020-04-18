@@ -39,7 +39,6 @@ int main(int argc, char * argv[])
     int sockfd, connfd, i, packet_id;
     unsigned int len;
     char buffer[BUF_SIZE], message[25];
-    int UDPbuffer[BUF_SIZE];
     FILE * fp;
     clock_t start_time, end_time;
     double total_time, low_entropy_time, high_entropy_time;
@@ -55,7 +54,7 @@ int main(int argc, char * argv[])
     }
     
 
-    //Pre-Probing Phase TCP
+    //Pre-Probing Phase TCP//
 
 
     //Creation of TCP socket
@@ -109,10 +108,10 @@ int main(int argc, char * argv[])
         printf("TCP Connection Established\n"); 
     }
 
-    //calling function to receive file from connection
+    //Calling function to receive file from connection
     receive_file(connfd);
 
-    //file parsing happens here
+    //File parsing happens here
     fp = fopen(argv[1],"r"); //opens the file myconfig.json
     fread(buffer, BUF_SIZE, 1, fp); //reads files and puts contents inside buffer
     parsed_json = json_tokener_parse(buffer);
@@ -137,8 +136,8 @@ int main(int argc, char * argv[])
 
 
     //Set up the server address for the udp header
-    
-    memset(&UDPbuffer, 0 , sizeof(UDPbuffer));
+    int UDPbuffer[json_object_get_int(Size_UDP_Payload)+2];
+    memset(&UDPbuffer, 0 , json_object_get_int(Size_UDP_Payload)+2);
     server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //hard coded ip
     server_address.sin_port = htons(json_object_get_int(Destination_Port_Number_UDP)); //port number
 
@@ -171,7 +170,7 @@ int main(int argc, char * argv[])
     start_time = clock();
     for(i = 0; i < json_object_get_int(Number_UDP_Packets); i++)
     {
-        recvfrom(sockfd, UDPbuffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len); //receive packets into buffer
+        recvfrom(sockfd, UDPbuffer, json_object_get_int(Size_UDP_Payload)+2, 0, ( struct sockaddr *) &client_address, &len); //receive packets into buffer
         packet_id = (int)(((unsigned)UDPbuffer[1] << 8) | UDPbuffer[0]); //reconstruct the packet id
         printf("Retrieved Low Entropy Packet Number: %d\n", packet_id);
     }
@@ -180,18 +179,17 @@ int main(int argc, char * argv[])
     low_entropy_time = total_time * 1000;
     printf("Low Entropy Time: %f\n", low_entropy_time);
 
-
-    printf("Sleeping...\n"); //Sleeping so packets don't get mixed up
+    //Sleeping inter measurement time
+    printf("Sleeping...\n"); 
     sleep(json_object_get_int(Inter_Measurement_Time));
-
 
     //Receive high entropy data
     printf("Receiving high entropy..\n");
-    memset(&UDPbuffer, 0, sizeof(UDPbuffer));
+    memset(&UDPbuffer, 0, json_object_get_int(Size_UDP_Payload)+2);
     start_time = clock();
     for(i = 0; i < json_object_get_int(Number_UDP_Packets); i++)
     {
-        recvfrom(sockfd, UDPbuffer, BUF_SIZE, 0, ( struct sockaddr *) &client_address, &len); //store packets into buffer
+        recvfrom(sockfd, UDPbuffer, json_object_get_int(Size_UDP_Payload)+2, 0, ( struct sockaddr *) &client_address, &len); //store packets into buffer
         packet_id = (((unsigned)UDPbuffer[1] << 8) | UDPbuffer[0]);
         printf("Retrieved High Entropy Packet Number: %d\n", packet_id);
     }
@@ -210,8 +208,10 @@ int main(int argc, char * argv[])
         strcpy(message, "NO COMPRESSION DETECTED\0");
     }
     
-    //tcp then send message
-    
+
+    //Post-Probing-TCP//
+
+
     sendto(sockfd, message, strlen(message), 0, (const struct sockaddr *) &client_address, sizeof(client_address));
     printf("Message sent\n");
     
