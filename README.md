@@ -53,3 +53,6 @@ The server - client application is complete. Standalone is still a work in progr
 ## Contributors
 Dennis Dang - [Github](github.com/dennisdang17) | [Linkedin](https://www.linkedin.com/in/dennisqdang) \
 Gerardo Aldana - [Github](github.com/GeoDude1)
+
+## License
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
