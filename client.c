@@ -67,7 +67,6 @@ void send_file(int sockfd)
 int main(int argc, char * argv[])
 {
     int sockfd, DF, i;
-    unsigned int len;
     char buffer[BUF_SIZE], compression[25];
     FILE * fp;
     struct sockaddr_in server_address, client_address;
@@ -219,11 +218,44 @@ int main(int argc, char * argv[])
 
 
     //Post Probing//
+    sleep(5);//let the server catch up
 
 
-    //receive response
-    recvfrom(sockfd, (char *)compression, BUF_SIZE, MSG_WAITALL, (struct sockaddr *) &server_address, &len);  
-    printf("Server : %s\n", compression); 
+    //TCP socket
+    printf("Creating Socket...\n");
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    { 
+        printf("Socket Creation Failed.\n"); 
+        exit(EXIT_FAILURE); 
+    } 
+    else
+    {
+        printf("Socket Successfully Created.\n"); 
+    }
+
+    //Fill in IP header
+	memset(&server_address, 0, sizeof(server_address));//zeroes out the server address
+    server_address.sin_family = AF_INET; // specifies address family with IPv4 Protocol 
+    server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //binds to IP Address
+    server_address.sin_port = htons(json_object_get_int(Port_Number_TCP)); //binds to PORT
+    
+
+	// This connects the client socket to server socket 
+    printf("Final Connection...\n");
+	if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
+    { 
+		printf("Failed to connect to server.\n"); 
+		exit(EXIT_FAILURE); 
+	} 
+	else
+	{
+        printf("Successfully connected to the server.\n"); 
+    }
+
+    
+    recv(sockfd, &compression, sizeof(compression), 0);
+    printf("Server's Response: %s\n" , compression);
+
     close(sockfd); 
     return 0;
 }
