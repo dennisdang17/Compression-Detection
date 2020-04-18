@@ -39,6 +39,7 @@ int main(int argc, char * argv[])
     int sockfd, connfd, i, packet_id;
     unsigned int len;
     char buffer[BUF_SIZE], message[25];
+    int UDPbuffer[BUF_SIZE];
     FILE * fp;
     clock_t start_time, end_time;
     double total_time, low_entropy_time, high_entropy_time;
@@ -136,7 +137,7 @@ int main(int argc, char * argv[])
 
 
     //Set up the server address for the udp header
-    int UDPbuffer[json_object_get_int(Size_UDP_Payload)+2];
+    
     memset(&UDPbuffer, 0 , sizeof(UDPbuffer));
     server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //hard coded ip
     server_address.sin_port = htons(json_object_get_int(Destination_Port_Number_UDP)); //port number
