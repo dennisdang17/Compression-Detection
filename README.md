@@ -49,7 +49,7 @@ gcc client.c -ljson-c -Wall -o "name of executable"
 ./"name of executable" myconfig.json
 ```
 ## Project Status
-
+The server - client application is complete. Standalone is still a work in progress.
 ## Contributors
 Dennis Dang - github.com/dennisdang17 \
 Gerardo Aldana - github.com/GeoDude1
