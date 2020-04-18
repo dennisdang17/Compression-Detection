@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
     //Check for proper usage
     if (argv[1] == NULL)
     {
-        printf("ERROR!\nProper ussage ./client 'my_config_file'.json\n");
+        printf("ERROR!\nProper ussage ./'name of executable' 'my_config_file'.json\n");
         return EXIT_FAILURE;
     }
 
