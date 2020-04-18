@@ -8,7 +8,10 @@ This is inspired by the work:\
 
 
 ## Installation
+**This program also requires you to download JSON. To do that on a linux computer input the following command into your terminal.**\
 ```bash
+sudo apt install libjson-c-dev
+#Now to install the repository
 git clone http://github.com/dennisdang17/Compression-Detection.git
 ```
 ## Usage
