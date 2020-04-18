@@ -49,7 +49,7 @@ int main(int argc, char * argv[])
 
     if(argv[1] == NULL) //check if usage is correct
     {
-        printf("ERROR!\nUsage is ./server 'my_config_file'\n");
+        printf("ERROR!\nUsage is ./'name of executable' 'my_config_file'\n");
         return EXIT_FAILURE;
     }
     
