@@ -49,7 +49,7 @@ gcc client.c -ljson-c -Wall -o "name of executable"
 ./"name of executable" myconfig.json
 ```
 ## Project Status / Known Issues
-The server - client application is complete. Standalone is still a work in progress.
+The server - client application is complete. Standalone is still a work in progress. \ The program has a bug where sometimes the packets will get dropped sometime on the way to the server, this leads to the server to continue to wait for the total number of packets to arive even though that will never happen as a packet is lost. Therefore the program crashes and that is an issue. A couple fixes we have come up with are timeouts after not receiving the total amount of packets, or to just send small packet trains as the chances of packets getting lost then are hard. 
 ## Contributors
 Dennis Dang - [Github](github.com/dennisdang17) | [Linkedin](https://www.linkedin.com/in/dennisqdang) \
 Gerardo Aldana - [Github](github.com/GeoDude1)
