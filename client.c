@@ -9,82 +9,172 @@
 #include <arpa/inet.h>      
 #include <errno.h>
 #include <time.h> 
+#include <ctype.h>
+#include <json-c/json.h>
 
-#define PAYLOAD_SIZE 1000
+#define BUF_SIZE 2000
 
-//Filling the payload with data
-void read_high_entropy_data(char * data, int len)
+//Filling the payload with high entropy data
+void read_high_entropy_data(int * data, int len)
 {
     FILE * f = fopen("/dev/urandom", "r");
-    char temp;
+    int temp;
     if(f == NULL)
     {
         return;
     }
-    for(int i=0; i < len; i++)
+    for(int i=2; i < len; i++)
     {
-        temp = getc(f);
+        temp = (int) getc(f);
         data[i] = temp;
     }
 }
 
 //Filling payload with low entropy data
-void read_low_entropy_data(char * data, int len)
+void read_low_entropy_data(int * data, int len)
 {
-    for(int i=0; i<len; i++) 
+    for(int i=2; i < len; i++) 
     {
         data[i] = 0;
     }
 }
 
-void set_packet_id(char * data, int index)
+//Set the packet id
+void set_packet_id(int * data, int index)
 {
-    int temp = index;
-    printf("Packet ID before: %d\n", temp);
-    unsigned char lsb = (unsigned)temp & 0xff;
-    unsigned char msb = (unsigned)temp >> 8;
-    data[0] = lsb;
-    data[1] = msb;
-    int packet_id = (int)(((unsigned)data[1] << 8) | data[0]);
-    printf("Packet ID after: %d\n", packet_id);
+    unsigned int temp = index;
+    unsigned char lsb = (unsigned)temp & 0xff; //divide by 255
+    unsigned char msb = (unsigned)temp >> 8; // shift bit over by 8
+    data[0] = lsb; //set the first index to lower bit
+    data[1] = msb; //set the second index to upper bit
 }
 
-int main()
+void send_file(int sockfd)
+{ 
+	char buffer[BUF_SIZE]; //stores message to send to server                         
+	FILE *fp=fopen("myconfig.json","r"); //opens file called myconfig.json, 'r' reads the file   
+	
+    while (fgets(buffer,BUF_SIZE,fp) != NULL ) //puts the file into the buffer
+	{
+        write(sockfd,buffer,strlen(buffer)); //writes to buffer which sends to server  
+    }
+	
+    fclose(fp);
+	printf("File was sent successfully.\n");
+}
+
+int main(int argc, char * argv[])
 {
-    int sockfd, length, DF;
-    char datagram[PAYLOAD_SIZE];
-    char buffer[25];
-    struct sockaddr_in server_address;
-    length = sizeof(datagram) / sizeof(char);
+    int sockfd, DF, i;
+    unsigned int len;
+    char buffer[BUF_SIZE], compression[25];
+    FILE * fp;
+    struct sockaddr_in server_address, client_address;
+    struct json_object *parsed_json, *Server_IP_Address, *Source_Port_Number_UDP, *Destination_Port_Number_UDP,
+    *Destination_Port_Number_TCP_Head, *Destination_Port_Number_TCP_Tail, *Port_Number_TCP, 
+    *Size_UDP_Payload, *Inter_Measurement_Time, *Number_UDP_Packets, *TTL_UDP_Packets;
+
+    //Check for proper usage
+    if (argv[1] == NULL)
+    {
+        printf("ERROR!\nProper ussage ./client 'my_config_file'.json\n");
+        return EXIT_FAILURE;
+    }
+
+
+    //Pre-Probing Phase TCP
+
+
+    //Open config file
+    fp = fopen(argv[1],"r"); //opens the file myconfig.json
+    if(fp == NULL)
+    {
+        printf("ERROR OPENNING FILE!\n"); //catch null pointer
+        return EXIT_FAILURE;
+    }
+    printf("Parsing...\n");
+    fread(buffer, BUF_SIZE, 1, fp); //reads files and puts contents inside buffer
+    parsed_json = json_tokener_parse(buffer); //parse JSON file's contents and converts them into a JSON object
+
+    //Store parsed data into variables
+    json_object_object_get_ex(parsed_json, "Server_IP_Address", &Server_IP_Address);
+    json_object_object_get_ex(parsed_json, "Source_Port_Number_UDP", &Source_Port_Number_UDP);
+    json_object_object_get_ex(parsed_json, "Destination_Port_Number_UDP", &Destination_Port_Number_UDP);
+    json_object_object_get_ex(parsed_json, "Destination_Port_Number_TCP_Head", &Destination_Port_Number_TCP_Head);
+    json_object_object_get_ex(parsed_json, "Destination_Port_Number_TCP_Tail", &Destination_Port_Number_TCP_Tail);
+    json_object_object_get_ex(parsed_json, "Port_Number_TCP", &Port_Number_TCP);
+    json_object_object_get_ex(parsed_json, "Size_UDP_Payload", &Size_UDP_Payload);
+    json_object_object_get_ex(parsed_json, "Inter_Measurement_Time", &Inter_Measurement_Time);
+    json_object_object_get_ex(parsed_json, "Number_UDP_Packets", &Number_UDP_Packets);
+    json_object_object_get_ex(parsed_json, "TTL_UDP_Packets", &TTL_UDP_Packets);
+    printf("Parsing Successful\n");
+
+    //Create tcp connection
+    printf("Creating Socket...\n");
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    { 
+        printf("Socket Creation Failed.\n"); 
+        exit(EXIT_FAILURE); 
+    } 
+    else
+    {
+        printf("Socket Successfully Created.\n"); 
+    }
+
+    //Fill in IP header
+	memset(&server_address, 0, sizeof(server_address));//zeroes out the server address
+    server_address.sin_family = AF_INET; // specifies address family with IPv4 Protocol 
+    server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //binds to IP Address
+    server_address.sin_port = htons(json_object_get_int(Port_Number_TCP)); //binds to PORT
     
 
-    //preProbing.
-
-
-    //creating socket
-    printf("Creating Socket...\n");
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 )
+	// This connects the client socket to server socket 
+    printf("Connecting...\n");
+	if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
     { 
-        perror("socket creation failed\n"); 
+		printf("Failed to connect to server.\n"); 
+		exit(EXIT_FAILURE); 
+	} 
+	else
+	{
+        printf("Successfully connected to the server.\n"); 
+    }
+	
+	//calling function to send file
+	send_file(sockfd); 
+
+    //closes the socket after transfer
+    close(sockfd); 
+
+
+
+    //PROBING PHASE//
+
+    int datagram[json_object_get_int(Size_UDP_Payload)];
+    
+
+    memset(&client_address, 0, sizeof(client_address));
+    client_address.sin_family = AF_INET; // specifies address family with IPv4 Protocol 
+    client_address.sin_addr.s_addr = htonl(INADDR_ANY); //binds to IP Address
+    client_address.sin_port = htons(json_object_get_int(Source_Port_Number_UDP));
+    server_address.sin_port = htons(json_object_get_int(Destination_Port_Number_UDP));
+
+    //Create UDP socket
+    printf("Creating Socket...\n");
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 )
+    { 
+        perror("UDP Socket Creation Failed\n"); 
         exit(EXIT_FAILURE); 
     }
     else
     {
-        printf("Socket created successfully!\n");
+        printf("UDP Socket Creation Successful\n");
     }
-
-
-    //set server struct header
-    memset(&server_address, 0 , sizeof(server_address));
-    server_address.sin_family = AF_INET;  //ipv4
-    server_address.sin_port = htons(8765); //server port
-    server_address.sin_addr.s_addr = inet_addr("192.168.1.28"); //Change to configfile.serverIP
-    
     
     //Don't fragment bit
     DF = IP_PMTUDISC_DO; //make val equal to dont fragment
     printf("Setting DON'T FRAGMENT bit...\n");
-    if(setsockopt( sockfd, IPPROTO_IP, IP_MTU_DISCOVER, &DF, sizeof(DF)) < 0)
+    if(setsockopt(sockfd, IPPROTO_IP, IP_MTU_DISCOVER, &DF, sizeof(DF)) < 0)
     {
         printf("Unable to set DON'T FRAGMENT bit\n");
     }
@@ -93,40 +183,47 @@ int main()
         printf("DON'T FRAGMENT bit set correctly!\n");
     }
 
+    if(bind(sockfd, (struct sockaddr *)&client_address, sizeof(client_address)) < 0)
+    {
+        printf("UDP Socket Bind Failed\n");
+        exit(EXIT_FAILURE);
+    }
 
-    //Probing phase. Sending packet of data
+    //Sending data packets
+    sleep(5);
 
-
-    //send low entropy now
-    read_low_entropy_data(datagram, length);
-    for(int i=0; i < 50; i++)//chagne to payload size
+    //Low entropy
+    read_low_entropy_data(datagram, json_object_get_int(Size_UDP_Payload));
+    printf("Sending Low Entropy Data...\n");
+    for(i = 1; i < json_object_get_int(Number_UDP_Packets)+1; i++)//chagne to payload size
     {
         set_packet_id(datagram, i);
-        sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
-    printf("Low entropy sent!!\n");
+    printf("Low Entropy Sent!\n");
 
 
     printf("Sleeping...\n");
-    sleep(15); //replace with inter time
+    sleep(json_object_get_int(Inter_Measurement_Time)); //replace with inter time
     
 
-    //send high entropy now
-    read_high_entropy_data(datagram, length);
-    for(int i=0; i < 50; i++) //change to payload size
+    //High Entropy
+    read_high_entropy_data(datagram, json_object_get_int(Size_UDP_Payload));
+    printf("Sending High Entropy Data...\n");
+    for(i = 1; i < json_object_get_int(Number_UDP_Packets)+1; i++) //change to payload size
     {
-        //set_packet_id(datagram, i);
-        sendto(sockfd, datagram, sizeof(datagram), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
+        set_packet_id(datagram, i);
+        sendto(sockfd, datagram, json_object_get_int(Size_UDP_Payload), MSG_CONFIRM, (const struct sockaddr *) &server_address, sizeof(server_address));
     }
-    printf("High entropy sent!!\n");
+    printf("High entropy sent!\n");
 
 
     //Post Probing
 
+
     //receive response
-    unsigned int len;
-    recvfrom(sockfd, (char *)buffer, 1024, MSG_WAITALL, (struct sockaddr *) &server_address, &len);  
-    printf("Server : %s\n", buffer); 
+    recvfrom(sockfd, (char *)compression, BUF_SIZE, MSG_WAITALL, (struct sockaddr *) &server_address, &len);  
+    printf("Server : %s\n", compression); 
     close(sockfd); 
     return 0;
 }
