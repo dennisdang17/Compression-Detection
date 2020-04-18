@@ -56,12 +56,12 @@ void send_file(int sockfd)
 	FILE *fp=fopen("myconfig.json","r"); //opens file called myconfig.json, 'r' reads the file   
 	
     while (fgets(buffer,BUF_SIZE,fp) != NULL ) //puts the file into the buffer
-	{
+    {
         write(sockfd,buffer,strlen(buffer)); //writes to buffer which sends to server  
     }
 	
     fclose(fp);
-	printf("File was sent successfully.\n");
+    printf("File was sent successfully.\n");
 }
 
 int main(int argc, char * argv[])
@@ -130,18 +130,18 @@ int main(int argc, char * argv[])
 
 	// This connects the client socket to server socket 
     printf("Connecting...\n");
-	if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
+    if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
     { 
-		printf("Failed to connect to server.\n"); 
-		exit(EXIT_FAILURE); 
-	} 
-	else
-	{
+	printf("Failed to connect to server.\n"); 
+	exit(EXIT_FAILURE); 
+    } 
+    else
+    {
         printf("Successfully connected to the server.\n"); 
     }
 	
 	//calling function to send file
-	send_file(sockfd); 
+    send_file(sockfd); 
 
     //closes the socket after transfer
     close(sockfd); 
@@ -234,21 +234,21 @@ int main(int argc, char * argv[])
     }
 
     //Fill in IP header
-	memset(&server_address, 0, sizeof(server_address));//zeroes out the server address
+    memset(&server_address, 0, sizeof(server_address));//zeroes out the server address
     server_address.sin_family = AF_INET; // specifies address family with IPv4 Protocol 
     server_address.sin_addr.s_addr = inet_addr(json_object_get_string(Server_IP_Address)); //binds to IP Address
     server_address.sin_port = htons(json_object_get_int(Port_Number_TCP)); //binds to PORT
     
 
-	// This connects the client socket to server socket 
+    // This connects the client socket to server socket 
     printf("Final Connection...\n");
-	if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
+    if (connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) != 0)
     { 
-		printf("Failed to connect to server.\n"); 
-		exit(EXIT_FAILURE); 
-	} 
-	else
-	{
+	printf("Failed to connect to server.\n"); 
+	exit(EXIT_FAILURE); 
+    } 
+    else
+    {
         printf("Successfully connected to the server.\n"); 
     }
 
