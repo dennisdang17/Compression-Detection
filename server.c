@@ -114,7 +114,7 @@ int main(int argc, char * argv[])
     //File parsing happens here
     fp = fopen(argv[1],"r"); //opens the file myconfig.json
     fread(buffer, BUF_SIZE, 1, fp); //reads files and puts contents inside buffer
-    parsed_json = json_tokener_parse(buffer);
+    parsed_json = json_tokener_parse(buffer); //call the json tokenizer
 
     //Storing the data into the correct variables
     json_object_object_get_ex(parsed_json, "Server_IP_Address", &Server_IP_Address);
@@ -260,6 +260,7 @@ int main(int argc, char * argv[])
         printf("TCP Connection Established\n"); 
     }
 
+    //Send the TCP message
     send(connfd, message, strlen(message), 0);
     
     close(sockfd);
