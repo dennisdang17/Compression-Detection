@@ -6,6 +6,8 @@ That is, the application detects network compression without requiring a special
 This is inspired by the work:\
 [End-to-End Detection of Compression of Traffic Flows by Intermediaries ](https://lasr.cs.ucla.edu/vahab/resources/compression_detection.pdf)
 
+## Requirements
+**YOU MUST HAVE A LINUX MACHINE IN ORDER TO BE ABLE TO RUN THIS PROGRAM. JSON ALSO MUST BE INSTALLED. PLEASE REFER TO INSTALLATION IF YOU HAVE PROBLEMS INSTALLING JSON**
 
 ## Installation
 **This program also requires you to download JSON. To install both JSON and the appllication on your linux computer/machine input the following commands into your terminal.**
