@@ -38,7 +38,7 @@ The Config file contains :
 **MAKE SURE TO RUN APPLCIATION ON SERVER SIDE FIRST**
 ```
 #On the server system
-./server server myconfig.json
+./"name of executable" myconfig.json
 #On the client system
-./client client myconfig.json
+./"name of executable" myconfig.json
 ```
