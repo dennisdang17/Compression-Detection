@@ -52,7 +52,7 @@ gcc client.c -ljson-c -Wall -o "name of executable"
 The server - client application is complete. \
 The program has a bug where sometimes the packets will get dropped sometime on the way to the server, this leads to the server to continue to wait for the total number of packets to arive even though that will never happen as a packet is lost. Therefore the program crashes and that is an issue. A couple fixes we have come up with are timeouts after not receiving the total amount of packets, or to just send small packet trains as the chances of packets getting lost then are hard. 
 
-The standalone program is still a work in progress. Our plan was to try to run the example of a raw socket implementation from the CS336 website so that we could observe how the program worked and where we should start with our implementation. However, we could not run the program after it was compiled. We added the JSON parsing and the sending of packets implementation.
+The standalone program is still a work in progress. Our plan was to try to run the example of a raw socket implementation from the CS336 website so that we could observe how the program worked and from there we would figure out a plan to begin our implementation. However, we could not run the program after it was compiled. We added the JSON parsing and the sending of packets implementation.
 ## Contributors
 Dennis Dang - [Github](github.com/dennisdang17) | [Linkedin](https://www.linkedin.com/in/dennisqdang) \
 Gerardo Aldana - [Github](github.com/GeoDude1)
